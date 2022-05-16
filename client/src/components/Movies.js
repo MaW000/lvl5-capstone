@@ -1,6 +1,6 @@
 export default function Movies(props) {
     return (
-        <div className="movies">
+        <div className="movies" >
             <div className="movies-obj">
                 <img className="movies-poster" src={props.Poster} alt=""></img>
                 <h1>{props.Title}</h1>
@@ -11,6 +11,7 @@ export default function Movies(props) {
             </div>
             <p className="movies-plot">{props.Plot}</p>
             </div>
+            <button className="del-btn" onClick={() => props.HandleDelete(props.id)}>Delete</button>
         </div>
     )
 }

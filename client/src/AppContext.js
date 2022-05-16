@@ -11,7 +11,6 @@ const AppContextProvider = (props) => {
       })
     
     const [movieData, setMovieData] = useState({
-        
         Title:'',
         Year:'',
         Rated:'',
@@ -20,7 +19,13 @@ const AppContextProvider = (props) => {
         Plot:''
     })
 
-    const [savedMovies, setSavedMovies] = useState({movies: []})
+    const [savedMovies, setSavedMovies] = useState([])
+
+    useEffect(() => {
+        axios.get('/movie')
+            .then(res => setSavedMovies(res.data))
+            .catch(err => console.log(err))
+    }, [])
 
     useEffect(() => {
         axios.get(`http://www.omdbapi.com/?t=${inputs.title}&y=${inputs.year}&apikey=c450e1a6`)
@@ -30,19 +35,14 @@ const AppContextProvider = (props) => {
             } return
     })
     }, [inputs])
-    
-    const List = savedMovies.movies.map(item => {
-        return (
-            <Movies
-                Title = {item.Title}
-                Year = {item.Year}
-                Rated = {item.Rated}
-                imdbRating = {item.imdbRating}
-                Poster = {item.Poster}
-                Plot = {item.Plot}
-            />
-        )
-    })
+
+    const HandleDelete = (id) => {
+        axios.delete(`/movie/${id}`)
+            .then(res => {
+                setSavedMovies(movies => movies.filter((movie) => movie._id !== id))
+            })
+            .catch(err => console.log(err))
+    }
     
     const HandleChange = (e) => {
         const { name, value } = e.target
@@ -54,15 +54,34 @@ const AppContextProvider = (props) => {
     }
 
     const HandleSave = () => {
-        setSavedMovies((prev) => ({
-            movies: [...prev.movies, movieData]
-        }))
+        axios.post('/movie', movieData)
+            .then(res => {
+                setSavedMovies(movie => [...movie, res.data])
+            })
+            .catch(err => console.log(err))
     }
     
+    const List = savedMovies.map(item => {
+        return (
+            <Movies
+                Title = {item.Title}
+                Year = {item.Year}
+                Rated = {item.Rated}
+                imdbRating = {item.imdbRating}
+                Poster = {item.Poster}
+                Plot = {item.Plot}
+                id = {item._id}
+                HandleDelete = {HandleDelete}
+                key = {item._id}
+            />
+        )
+    })
+
     return(
         <AppContext.Provider value={{
             HandleChange,
             HandleSave,
+            HandleDelete,
             inputs,
             List,
             savedMovies,

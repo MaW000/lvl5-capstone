@@ -23,4 +23,14 @@ movieRouter.post("/", (req, res, next) => {
     })
   })
 
+movieRouter.delete("/:movieId", (req, res, next) => {
+    Movie.findOneAndDelete({ _id: req.params.movieId}, (err, deleted) => {
+        if(err){
+            res.status(500)
+            return next(err)
+        }
+        return res.status(200).send(`Successfully deleted item ${deleted}`)
+    })
+})
+
 module.exports = movieRouter
